@@ -1,23 +1,30 @@
 Class {
-	#name : #SGRedState,
-	#superclass : #SGNullState,
-	#category : #'Myg-SameGame-Model'
+	#name : 'SGRedState',
+	#superclass : 'SGNullState',
+	#category : 'Myg-SameGame-Model',
+	#package : 'Myg-SameGame',
+	#tag : 'Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SGRedState >> backgroundRepresentation [
 
 	^ Color lightRed
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SGRedState >> isNull [
 
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 SGRedState >> literal [
 
 	^ 'R'
+]
+
+{ #category : 'accessing' }
+SGRedState >> nextStateInCycle [
+	^ SGBlueState uniqueInstance
 ]

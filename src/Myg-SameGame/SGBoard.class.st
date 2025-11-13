@@ -1,38 +1,40 @@
 Class {
-	#name : #SGBoard,
-	#superclass : #MygBoard,
+	#name : 'SGBoard',
+	#superclass : 'MygBoard',
 	#instVars : [
 		'game',
 		'hitList'
 	],
-	#category : #'Myg-SameGame-Model'
+	#category : 'Myg-SameGame-Model',
+	#package : 'Myg-SameGame',
+	#tag : 'Model'
 }
 
-{ #category : #compute }
+{ #category : 'compute' }
 SGBoard >> boxAt: aPoint [
 
 	^ self grid at: aPoint x @ aPoint y
 ]
 
-{ #category : #compute }
+{ #category : 'compute' }
 SGBoard >> calculePoint [
 
 	^ hitList size * hitList size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SGBoard >> game [
 
 	^ game
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SGBoard >> game: aGame [
 
 	game := aGame
 ]
 
-{ #category : #reorganize }
+{ #category : 'reorganize' }
 SGBoard >> generateGridWidth: width height: height [
 
 	| array2D |
@@ -43,15 +45,18 @@ SGBoard >> generateGridWidth: width height: height [
 	self configureGrid: array2D
 ]
 
-{ #category : #hit }
+{ #category : 'hit' }
 SGBoard >> hitBox: aBox [
 
 	aBox hasNullState ifTrue: [ ^ self ].
 	aBox propagateClick.
+	
 	self hitList size > 1 ifTrue: [
 		self hitList do: [ :each | each state: SGNullState uniqueInstance ] ].
 
 	self game addPoints: self calculePoint.
+	
+	self updateBoxWithColorCycling .
 
 	self hitList do: [ :each | self reorganizeColumn: each x ].
 
@@ -60,7 +65,7 @@ SGBoard >> hitBox: aBox [
 	self reorganizeForEmptyColumn
 ]
 
-{ #category : #hit }
+{ #category : 'hit' }
 SGBoard >> hitBoxOnx: x y: y [
 
 	(self grid at: x @ y) hasNullState ifTrue: [ ^ self ].
@@ -69,6 +74,8 @@ SGBoard >> hitBoxOnx: x y: y [
 		self hitList do: [ :each | each state: SGNullState uniqueInstance  ] ].
 
 	self game addPoints: self calculePoint.
+	
+	self updateBoxWithColorCycling .
 
 	self hitList do: [ :each | self reorganizeColumn: each x ].
 
@@ -77,13 +84,13 @@ SGBoard >> hitBoxOnx: x y: y [
 	self reorganizeForEmptyColumn
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SGBoard >> hitList [ 
 
 	^ hitList 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 SGBoard >> initialize [
 
 	super initialize.
@@ -92,7 +99,7 @@ SGBoard >> initialize [
 	"stock les cases touchées"
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SGBoard >> isColumnEmpty: x [
 
 	1 to: self grid height do: [ :i |
@@ -100,19 +107,25 @@ SGBoard >> isColumnEmpty: x [
 	^ true
 ]
 
-{ #category : #'random subclass instance creation' }
+{ #category : 'random subclass instance creation' }
 SGBoard >> randomBox [
 
-	| states |
+	| states boxes|
+	
+	boxes := Array new: 10.
+	1 to: 9 do: [:i | boxes at: i put: SGBox]. 
+	"On peut modifier ici le chiffre après le to: pour varier la probabilité d'avoir des box avec cycle"
+	boxes at: 10 put: SGBoxWithCyclingColor .
+	
 	states := {
 		          SGBlueState.
 		          SGRedState.
 		          SGGreenState.
 		          SGYellowState }.
-	^ SGBox withState: states atRandom uniqueInstance 
+	^ ( boxes atRandom ) withState: states atRandom uniqueInstance 
 ]
 
-{ #category : #reorganize }
+{ #category : 'reorganize' }
 SGBoard >> reorganizeColumn: x [
 
 	| col newCol |
@@ -123,7 +136,7 @@ SGBoard >> reorganizeColumn: x [
 	(col at: j) state: SGNullState uniqueInstance ]
 ]
 
-{ #category : #reorganize }
+{ #category : 'reorganize' }
 SGBoard >> reorganizeForEmptyColumn [
 
 	| cpt |
@@ -132,10 +145,10 @@ SGBoard >> reorganizeForEmptyColumn [
 		(self isColumnEmpty: i - cpt) ifTrue: [
 			i - cpt to: self grid width - 1 - cpt do: [ :j |
 				self switchColumn: j withColumn: j + 1 ].
-			cpt := cpt + 1 ] ]
+			cpt := cpt + 1 ] ] .
 ]
 
-{ #category : #compute }
+{ #category : 'compute' }
 SGBoard >> switchBox: aPoint1 with: aPoint2 [
 
 	| box1 box2 tmpState |
@@ -148,9 +161,19 @@ SGBoard >> switchBox: aPoint1 with: aPoint2 [
 	box2 state: tmpState 
 ]
 
-{ #category : #compute }
+{ #category : 'compute' }
 SGBoard >> switchColumn: firstColumn withColumn: secondColumn [
 
 	1 to: self grid height do: [ :i |
 	self switchBox: firstColumn @ i with: secondColumn @ i ]
+]
+
+{ #category : 'reorganize' }
+SGBoard >> updateBoxWithColorCycling [
+
+	1 to: self grid width do: [:x |
+   		1 to: self grid height do: [:y |
+        ( self boxAt: x @ y ) updateStateWithCycle .
+   		].
+	].
 ]
