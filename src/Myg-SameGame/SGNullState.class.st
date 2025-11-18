@@ -34,6 +34,24 @@ SGNullState >> isNull [
 	^ true
 ]
 
+{ #category : 'testing' }
+SGNullState >> isSpecialKillTile [
+	"Par défaut, les états ne sont pas des tuiles spéciales"
+	^ false
+]
+
+{ #category : 'as yet unclassified' }
+SGNullState >> killsColumn [
+	"Par défaut, les états ne tuent pas de colonne"
+	^ false
+]
+
+{ #category : 'as yet unclassified' }
+SGNullState >> killsLine [
+	"Par défaut, les états ne tuent pas de ligne"
+	^ false
+]
+
 { #category : 'accessing' }
 SGNullState >> literal [
 

@@ -43,7 +43,8 @@ SGBoxElement >> box: aSGBox [
 
 	box := aSGBox.
 	
-	self initializeAnnouncements
+	self initializeAnnouncements.
+	self initializeSpecialIndicator
 ]
 
 { #category : 'public' }
@@ -83,8 +84,41 @@ SGBoxElement >> initializeAnnouncements [
 	self box announcer when: SGStateChangedAnnouncement send: #updateBackgroundColor to: self
 ]
 
+{ #category : 'initialization' }
+SGBoxElement >> initializeSpecialIndicator [
+	| label |
+	"Ajoute un indicateur visuel si c'est une tuile spéciale"
+	
+	self box ifNil: [ ^ self ].
+	
+	(self box state isSpecialKillTile) ifFalse: [ ^ self ].
+	
+	"Ajouter une bordure épaisse pour les tuiles spéciales"
+	self border: (BlBorder paint: Color white width: 3).
+	
+	"Ajouter un texte indicateur"
+	self layout: BlFrameLayout new.
+	
+
+	label := BlTextElement new.
+	label text: (self box state killsLine 
+		ifTrue: [ ('—' asRopedText fontSize: 30; foreground: Color white) ]
+		ifFalse: [ ('|' asRopedText fontSize: 30; foreground: Color white) ]).
+	
+	label constraintsDo: [ :c |
+		c frame horizontal alignCenter.
+		c frame vertical alignCenter ].
+	
+	self addChild: label
+]
+
 { #category : 'change reporting' }
 SGBoxElement >> updateBackgroundColor [
 
-	^ self background: self box backgroundRepresentation
+	"Mise à jour avec gestion des tuiles spéciales"
+	
+	self removeChildren.
+	self background: self box backgroundRepresentation.
+	self initializeSpecialIndicator.
+	^ self
 ]

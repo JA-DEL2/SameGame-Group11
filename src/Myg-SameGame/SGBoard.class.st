@@ -45,10 +45,32 @@ SGBoard >> generateGridWidth: width height: height [
 	self configureGrid: array2D
 ]
 
+{ #category : 'as yet unclassified' }
+SGBoard >> handleSpecialKillBox: aBox [
+
+	"Gère le clic sur une tuile spéciale Kill Line ou Kill Column"
+	
+	aBox state killsLine ifTrue: [ 
+		self killLineAt: aBox y.
+		^ self ].
+	
+	aBox state killsColumn ifTrue: [ 
+		self killColumnAt: aBox x.
+		^ self ]
+]
+
 { #category : 'hit' }
 SGBoard >> hitBox: aBox [
 
+	"Version améliorée qui gère les tuiles spéciales"
+	
 	aBox hasNullState ifTrue: [ ^ self ].
+	
+	"Vérifier si c'est une tuile spéciale de type Kill"
+	(aBox state isSpecialKillTile) ifTrue: [
+		^ self handleSpecialKillBox: aBox ].
+	
+	"Comportement normal pour les tuiles classiques"
 	aBox propagateClick.
 	
 	self hitList size > 1 ifTrue: [
@@ -56,7 +78,7 @@ SGBoard >> hitBox: aBox [
 
 	self game addPoints: self calculePoint.
 	
-	self updateBoxWithColorCycling .
+	"SUPPRIMÉ : self updateBoxWithColorCycling."
 
 	self hitList do: [ :each | self reorganizeColumn: each x ].
 
@@ -107,22 +129,88 @@ SGBoard >> isColumnEmpty: x [
 	^ true
 ]
 
+{ #category : 'accessing' }
+SGBoard >> killColumnAt: columnNumber [
+	"Élimine toute la colonne verticale à la position donnée"
+	
+	| killedBoxes |
+	killedBoxes := OrderedCollection new.
+	
+	"Collecter toutes les boxes de la colonne"
+	1 to: self grid height do: [ :row |
+		| box |
+		box := self boxAt: columnNumber @ row.
+		box hasNullState ifFalse: [ 
+			killedBoxes add: box.
+			box state: SGNullState uniqueInstance ] ].
+	
+	"Ajouter des points : nombre de cases * 2 (bonus pour tuile spéciale)"
+	self game addPoints: (killedBoxes size * 2).
+	
+	"Réorganiser la colonne affectée et les colonnes vides"
+	self reorganizeColumn: columnNumber.
+	self reorganizeForEmptyColumn
+]
+
+{ #category : 'accessing' }
+SGBoard >> killLineAt: rowNumber [
+	"Élimine toute la ligne horizontale à la position donnée"
+	
+	| killedBoxes |
+	killedBoxes := OrderedCollection new.
+	
+	"Collecter toutes les boxes de la ligne"
+	1 to: self grid width do: [ :col |
+		| box |
+		box := self boxAt: col @ rowNumber.
+		box hasNullState ifFalse: [ 
+			killedBoxes add: box.
+			box state: SGNullState uniqueInstance ] ].
+	
+	"Ajouter des points : nombre de cases * 2 (bonus pour tuile spéciale)"
+	self game addPoints: (killedBoxes size * 2).
+	
+	"Réorganiser les colonnes"
+	1 to: self grid width do: [ :col |
+		self reorganizeColumn: col ].
+	
+	self reorganizeForEmptyColumn
+]
+
 { #category : 'random subclass instance creation' }
 SGBoard >> randomBox [
 
-	| states boxes|
+	"Version améliorée avec tuiles spéciales rares"
 	
-	boxes := Array new: 10.
-	1 to: 9 do: [:i | boxes at: i put: SGBox]. 
-	"On peut modifier ici le chiffre après le to: pour varier la probabilité d'avoir des box avec cycle"
-	boxes at: 10 put: SGBoxWithCyclingColor .
+	| boxes states random |
 	
+	boxes := Array new: 100.
+	
+	"90 boxes normales"
+	1 to: 90 do: [:i | boxes at: i put: SGBox].
+	
+	"5 boxes Kill Line (rares)"
+	91 to: 95 do: [:i | boxes at: i put: SGBoxWithKillAbility].
+	
+	"5 boxes Kill Column (rares)"
+	96 to: 100 do: [:i | boxes at: i put: SGBoxWithKillAbility].
+	
+	random := boxes atRandom.
+	
+	"Si c'est une box spéciale Kill, retourner avec le bon état"
+	(random = SGBoxWithKillAbility) ifTrue: [
+		"50% chance pour Kill Line, 50% pour Kill Column"
+		^ (Random new next < 0.5)
+			ifTrue: [ SGBoxWithKillAbility killLine ]
+			ifFalse: [ SGBoxWithKillAbility killColumn ] ].
+	
+	"Sinon, comportement normal"
 	states := {
-		          SGBlueState.
-		          SGRedState.
-		          SGGreenState.
-		          SGYellowState }.
-	^ ( boxes atRandom ) withState: states atRandom uniqueInstance 
+		SGBlueState.
+		SGRedState.
+		SGGreenState.
+		SGYellowState }.
+	^ random withState: states atRandom uniqueInstance
 ]
 
 { #category : 'reorganize' }
@@ -171,9 +259,11 @@ SGBoard >> switchColumn: firstColumn withColumn: secondColumn [
 { #category : 'reorganize' }
 SGBoard >> updateBoxWithColorCycling [
 
+	"Met à jour l'état des boxes avec cycle de couleur après chaque coup"
+
 	1 to: self grid width do: [:x |
    		1 to: self grid height do: [:y |
-        ( self boxAt: x @ y ) updateStateWithCycle .
+        	(self boxAt: x @ y) updateStateWithCycle.
    		].
 	].
 ]
