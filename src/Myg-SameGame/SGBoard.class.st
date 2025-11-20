@@ -78,7 +78,7 @@ SGBoard >> hitBox: aBox [
 
 	self game addPoints: self calculePoint.
 	
-	"SUPPRIMÉ : self updateBoxWithColorCycling."
+	self updateBoxWithColorCycling.
 
 	self hitList do: [ :each | self reorganizeColumn: each x ].
 
@@ -194,6 +194,9 @@ SGBoard >> randomBox [
 	
 	"5 boxes Kill Column (rares)"
 	96 to: 100 do: [:i | boxes at: i put: SGBoxWithKillAbility].
+	
+	"10 boxes with color cycle"
+	81 to: 90 do: [:i | boxes at: i put: SGBoxWithCyclingColor].
 	
 	random := boxes atRandom.
 	
