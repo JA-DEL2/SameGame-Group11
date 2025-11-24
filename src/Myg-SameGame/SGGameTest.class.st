@@ -13,11 +13,12 @@ SGGameTest >> testKilledTilesAreAccumulated [
 	board := SGBoard new game: game.
    "2 tiles/boxes deleted"
 	board hitList addAll: { SGBox new. SGBox new }.
-	board updateKilledTiles.
+	board updateKilledTiles. 
+	board hitList removeAll.
 	"1 tile/box deleted"
 	board hitList add: SGBox new.
 	board updateKilledTiles.
-
+	board hitList removeAll.
 	self assert: game killedTiles equals: 3.
 ]
 
