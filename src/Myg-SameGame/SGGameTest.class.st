@@ -20,3 +20,17 @@ SGGameTest >> testKilledTilesAreAccumulated [
 
 	self assert: game killedTiles equals: 3.
 ]
+
+{ #category : 'tests' }
+SGGameTest >> testLastSelectionCountUpdatedCorrectly [
+	| game board |
+	game := SGGame new.
+	board := SGBoard new game: game.
+	
+	"Simulate a selection of 3 cases"
+	board hitList addAll: { SGBox new. SGBox new. SGBox new }.
+
+	board updateSelectionCount.
+
+	self assert: game lastSelectionCount equals: 3.
+]
