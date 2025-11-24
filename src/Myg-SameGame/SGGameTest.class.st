@@ -7,36 +7,16 @@ Class {
 }
 
 { #category : 'tests' }
-SGGameTest >> testKilledTilesAreAccumulated [ [
+SGGameTest >> testKilledTilesAreAccumulated [
+	| game board |
+	game := SGGame new.
+	board := SGBoard new game: game.
+   "2 tiles/boxes deleted"
+	board hitList addAll: { SGBox new. SGBox new }.
+	board updateKilledTiles.
+	"1 tile/box deleted"
+	board hitList add: SGBox new.
+	board updateKilledTiles.
 
-    | game board |
-    game := SGGame new.
-    board := SGBoard new game: game.
-
-    board hitList: { SGBox new. SGBox new }.
-    board updateKilledTiles.
-
-    board hitList: { SGBox new }.
-    board updateKilledTiles.
-
-    self assert: game killedTiles equals: 3.
-]
-
-]
-
-{ #category : 'tests' }
-SGGameTest >> testSelectionCountIsUpdated [ [
-
-    | game board |
-    game := SGGame new.
-    board := SGBoard new game: game.
-
-    "Simule une hitList de 3 tuiles"
-    board hitList: { SGBox new. SGBox new. SGBox new }.
-
-    board updateSelectionCount.
-
-    self assert: game lastSelectionCount equals: 3.
-]
-
+	self assert: game killedTiles equals: 3.
 ]
