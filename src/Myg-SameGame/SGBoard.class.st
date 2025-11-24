@@ -270,3 +270,15 @@ SGBoard >> updateBoxWithColorCycling [
    		].
 	].
 ]
+
+{ #category : 'accessing' }
+SGBoard >> updateKilledTiles [
+	"Accumulate number of removed tiles"
+	self game killedTiles: (self game killedTiles + self hitList size)
+]
+
+{ #category : 'accessing' }
+SGBoard >> updateSelectionCount [
+	"Store number of tiles selected in the last move"
+	self game lastSelectionCount: self hitList size
+]

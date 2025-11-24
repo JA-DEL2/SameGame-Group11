@@ -3,7 +3,9 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'board',
-		'points'
+		'points',
+		'killedTiles',
+		'lastSelectionCount'
 	],
 	#category : 'Myg-SameGame-Model',
 	#package : 'Myg-SameGame',
@@ -30,9 +32,31 @@ SGGame >> grid: aBoard [
 
 { #category : 'initialization' }
 SGGame >> initialize [
+    super initialize.
+    points := 0.
+    lastSelectionCount := 0.
+    killedTiles := 0.
 
-	super initialize.
-	self points: 0
+]
+
+{ #category : 'accessing' }
+SGGame >> killedTiles [
+	^ killedTiles 
+]
+
+{ #category : 'accessing' }
+SGGame >> killedTiles: aNumber [
+	killedTiles := aNumber
+]
+
+{ #category : 'accessing' }
+SGGame >> lastSelectionCount [
+	^ lastSelectionCount
+]
+
+{ #category : 'accessing' }
+SGGame >> lastSelectionCount: aNumber [
+	lastSelectionCount := aNumber
 ]
 
 { #category : 'accessing' }
