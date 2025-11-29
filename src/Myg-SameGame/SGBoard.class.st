@@ -100,9 +100,9 @@ SGBoard >> hitBoxOnx: x y: y [
 	self updateBoxWithColorCycling .
 
 	self hitList do: [ :each | self reorganizeColumn: each x ].
-
+	self updateKilledTiles.
+	self updateSelectionCount.
 	self hitList removeAll.
-
 	self reorganizeForEmptyColumn
 ]
 
