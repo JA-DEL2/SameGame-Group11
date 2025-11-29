@@ -14,11 +14,11 @@ SGGameTest >> testKilledTilesAreAccumulated [
    "2 tiles/boxes deleted"
 	board hitList addAll: { SGBox new. SGBox new }.
 	board updateKilledTiles. 
+	self assert: game killedTiles equals: 2.
 	board hitList removeAll.
 	"1 tile/box deleted"
 	board hitList add: SGBox new.
-	board updateKilledTiles.
-	board hitList removeAll.
+	board updateKilledTiles. 
 	self assert: game killedTiles equals: 3.
 ]
 
@@ -34,4 +34,10 @@ SGGameTest >> testLastSelectionCountUpdatedCorrectly [
 	board updateSelectionCount.
 
 	self assert: game lastSelectionCount equals: 3.
+	board hitList removeAll.
+	board hitList addAll: { SGBox new. }.
+
+	board updateSelectionCount.
+
+	self assert: game lastSelectionCount equals: 1.
 ]
