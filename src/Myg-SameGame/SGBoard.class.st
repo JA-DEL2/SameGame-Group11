@@ -3,12 +3,19 @@ Class {
 	#superclass : 'MygBoard',
 	#instVars : [
 		'game',
-		'hitList'
+		'hitList',
+		'announcer'
 	],
 	#category : 'Myg-SameGame-Model',
 	#package : 'Myg-SameGame',
 	#tag : 'Model'
 }
+
+{ #category : 'accessing' }
+SGBoard >> announcer [
+
+	^ announcer ifNil: [ announcer := Announcer new ]
+]
 
 { #category : 'compute' }
 SGBoard >> boxAt: aPoint [
@@ -117,6 +124,7 @@ SGBoard >> initialize [
 
 	super initialize.
 	hitList := OrderedCollection new.
+	announcer := Announcer new.
 	"stackHit := Stack new -> has no reference"
 	"stock les cases touchées"
 ]
@@ -274,11 +282,13 @@ SGBoard >> updateBoxWithColorCycling [
 { #category : 'accessing' }
 SGBoard >> updateKilledTiles [
 	"Accumulate number of removed tiles"
-	self game killedTiles: (self game killedTiles + self hitList size)
+	self game killedTiles: (self game killedTiles + self hitList size).
+	announcer announce: SGStatsChangedAnnouncement new.
 ]
 
 { #category : 'accessing' }
 SGBoard >> updateSelectionCount [
 	"Store number of tiles selected in the last move"
-	self game lastSelectionCount: self hitList size
+	self game lastSelectionCount: self hitList size.
+	announcer announce: SGStatsChangedAnnouncement new.
 ]
