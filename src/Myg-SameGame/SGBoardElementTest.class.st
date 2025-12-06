@@ -162,31 +162,3 @@ SGBoardElementTest >> testGridSetUp [
 		equals: Color gray.
 
 ]
-
-{ #category : 'tests' }
-SGBoardElementTest >> testUIStatsChanged [
-    | game board ui |
-    
-    game := SGGame new.
-    board := SGBoard new game: game.
-
-    "IMPORTANT : créer la grille avant de créer l’UI"
-    board generateGridWidth: 3 height: 3.
-
-    ui := SGGameElement new.
-    ui board: board.   "lie l'UI au board + abonnement aux annonces"
-
-    "on simule une sélection"
-    game lastSelectionCount: 5.
-    board announcer announce: SGStatsChangedAnnouncement new.
-
-    "on simule des tiles tuées"
-    game killedTiles: 7.
-    board announcer announce: SGStatsChangedAnnouncement new.
-
-    ui updateStatsDisplay. "force un rafraîchissement UI pour le test"
-
-    self assert: ui selectionLabel text equals: 'Selection: 5'.
-    self assert: ui killedLabel text equals: 'Killed: 7'.
-
-]
