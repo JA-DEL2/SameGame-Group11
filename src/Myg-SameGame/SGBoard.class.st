@@ -88,7 +88,8 @@ SGBoard >> hitBox: aBox [
 	self updateBoxWithColorCycling.
 
 	self hitList do: [ :each | self reorganizeColumn: each x ].
-
+	self updateKilledTiles.       
+	self updateSelectionCount. 
 	self hitList removeAll.
 
 	self reorganizeForEmptyColumn
@@ -155,6 +156,11 @@ SGBoard >> killColumnAt: columnNumber [
 	"Ajouter des points : nombre de cases * 2 (bonus pour tuile spéciale)"
 	self game addPoints: (killedBoxes size * 2).
 	
+	"modifier les stats des labels"
+	self game lastSelectionCount: killedBoxes size.
+	self game killedTiles: (self game killedTiles + killedBoxes size).
+	announcer announce: SGStatsChangedAnnouncement new.
+	
 	"Réorganiser la colonne affectée et les colonnes vides"
 	self reorganizeColumn: columnNumber.
 	self reorganizeForEmptyColumn
@@ -178,6 +184,10 @@ SGBoard >> killLineAt: rowNumber [
 	"Ajouter des points : nombre de cases * 2 (bonus pour tuile spéciale)"
 	self game addPoints: (killedBoxes size * 2).
 	
+	"modifier les stats des labels"
+	self game lastSelectionCount: killedBoxes size.
+	self game killedTiles: (self game killedTiles + killedBoxes size).
+	announcer announce: SGStatsChangedAnnouncement new.
 	"Réorganiser les colonnes"
 	1 to: self grid width do: [ :col |
 		self reorganizeColumn: col ].
