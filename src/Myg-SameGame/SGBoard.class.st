@@ -291,9 +291,11 @@ SGBoard >> updateBoxWithColorCycling [
 
 { #category : 'accessing' }
 SGBoard >> updateKilledTiles [
-	"Accumulate number of removed tiles"
-	self game killedTiles: (self game killedTiles + self hitList size).
-	announcer announce: SGStatsChangedAnnouncement new.
+    "Accumulate number of removed tiles only if more than 1 tile"
+    self hitList size > 1 ifTrue: [
+        self game killedTiles: (self game killedTiles + self hitList size).
+        announcer announce: SGStatsChangedAnnouncement new.
+		].
 ]
 
 { #category : 'accessing' }
