@@ -90,6 +90,39 @@ SGGameElementTest >> testKillLineUpdatesStatsOnGeneratedBoard [
 ]
 
 { #category : 'tests' }
+SGGameElementTest >> testKilledTilesNotUpdated [
+    | game board boxElement ui |
+
+    "Initialisation"
+    game := SGGame new.
+    board := SGBoard new game: game.
+
+    "Créer une grille simple 2x2"
+    board configureGrid: ((CTNewArray2D width: 2 height: 2)
+        at: 1 @ 1 put: SGBox blue;
+        at: 2 @ 1 put: SGBox null;
+        at: 1 @ 2 put: SGBox red;
+        at: 2 @ 2 put: SGBox red;
+        yourself).
+
+    ui := SGGameElement new.
+    ui board: board.
+
+    "Cas 1: box vide (SGNullState)"
+    boxElement := board boxAt: 2 @ 1.
+    board hitBox: boxElement.
+    board updateKilledTiles.
+    self assert: game killedTiles equals: 0.
+
+    "Cas 2: box seule sélectionnée"
+    boxElement := board boxAt: 1 @ 1.
+    board hitBox: boxElement.
+    board updateKilledTiles.
+    self assert: game killedTiles equals: 0.
+
+]
+
+{ #category : 'tests' }
 SGGameElementTest >> testUIStatsAccumulateOverMultipleMoves [
     "Vérifie que killedTiles s'accumule sur plusieurs coups"
     | game board ui |
