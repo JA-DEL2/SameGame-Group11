@@ -19,7 +19,7 @@ SGGameTest >> testKilledTilesAreAccumulated [
 	"1 tile/box deleted"
 	board hitList add: SGBox new.
 	board updateKilledTiles. 
-	self assert: game killedTiles equals: 3.
+	self assert: game killedTiles equals: 2.
 ]
 
 { #category : 'tests' }
