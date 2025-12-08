@@ -37,8 +37,6 @@ SGGameElement >> board: aBoard [
     gridElement constraintsDo: [:c |
         c horizontal matchParent.
         c vertical matchParent ].
-    
-    self requestLayout.
 ]
 
 { #category : 'accessing' }
